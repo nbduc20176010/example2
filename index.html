@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div
+            id="drop_zone"
+            ondrop="dropHandler(event);"
+            ondragover="handleDragOver(event)"
+            style="border: 5px solid blue; width: 200px; height: 100px"
+        >
+            <p>Drag one or more files to this <i>drop zone</i>.</p>
+        </div>
+        <div>
+            <p id="result"></p>
+        </div>
+        <script>
+            worker = new Worker("worker.js");
+            worker.onmessage = (e) => {
+                console.log(e.data);
+                document.getElementById("result").innerHTML = e.data;
+            };
+            let dropHandler = (ev) => {
+                console.log("File(s) dropped");
+                ev.preventDefault();
+                [...ev.dataTransfer.items].forEach((item, i) => {
+                    const file = item.getAsFile();
+                    worker.postMessage(file);
+                });
+            };
+            let handleDragOver = (ev) => {
+                console.log("File(s) dragged over");
+                ev.preventDefault();
+            };
+        </script>
+    </body>
+</html>
